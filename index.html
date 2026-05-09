@@ -1,0 +1,833 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#1F3864">
+<title>Deutsch Trainer</title>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+  html,body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;font-size:16px;line-height:1.5;color:#222;background:#f5f7fa;min-height:100vh}
+  body{padding-bottom:80px}
+  header{position:sticky;top:0;background:#1F3864;color:#fff;padding:12px 16px;box-shadow:0 2px 8px rgba(0,0,0,.15);z-index:100}
+  header h1{font-size:18px;font-weight:700}
+  header .subtitle{font-size:12px;opacity:.8;margin-top:2px}
+  main{padding:16px;max-width:720px;margin:0 auto}
+  section{display:none}
+  section.active{display:block}
+  h2{font-size:22px;color:#1F3864;margin-bottom:12px;padding-bottom:8px;border-bottom:2px solid #5B9BD5}
+  h3{font-size:17px;color:#2E5984;margin:16px 0 8px}
+  h4{font-size:15px;color:#365F91;margin:12px 0 6px}
+  p{margin-bottom:8px}
+  .card{background:#fff;border-radius:12px;padding:16px;margin-bottom:12px;box-shadow:0 2px 4px rgba(0,0,0,.06)}
+  .btn{display:inline-block;background:#1F3864;color:#fff;padding:12px 20px;border-radius:8px;border:none;font-size:16px;font-weight:600;cursor:pointer;text-align:center;min-height:48px}
+  .btn:active{transform:scale(.97)}
+  .btn-success{background:#28a745}
+  .btn-secondary{background:#6c757d}
+  .btn-block{display:block;width:100%;margin-bottom:8px}
+  .btn-row{display:flex;gap:8px;flex-wrap:wrap}
+  .btn-row .btn{flex:1;min-width:100px}
+  .nav-bottom{position:fixed;bottom:0;left:0;right:0;background:#fff;box-shadow:0 -2px 8px rgba(0,0,0,.1);display:flex;padding:6px 4px;z-index:100}
+  .nav-bottom button{flex:1;background:none;border:none;padding:6px 2px;cursor:pointer;color:#6c757d;font-size:10px;display:flex;flex-direction:column;align-items:center;gap:2px;min-height:60px}
+  .nav-bottom button.active{color:#1F3864}
+  .nav-bottom button .icon{font-size:22px}
+  textarea{width:100%;min-height:200px;padding:12px;border:2px solid #ccc;border-radius:8px;font-size:16px;font-family:inherit;resize:vertical}
+  textarea:focus{outline:none;border-color:#5B9BD5}
+  .word-count{font-size:12px;color:#666;text-align:right;margin-top:4px}
+  .word-count.good{color:#28a745;font-weight:600}
+  .schedule-item{display:flex;gap:12px;align-items:flex-start;padding:12px;background:#fff;border-radius:8px;margin-bottom:8px;box-shadow:0 1px 3px rgba(0,0,0,.08)}
+  .schedule-item.done{opacity:.5;background:#e9f5e9}
+  .schedule-item .time{font-weight:700;color:#1F3864;min-width:70px;font-size:14px}
+  .schedule-item .desc{flex:1;font-size:14px}
+  .schedule-item input[type="checkbox"]{width:24px;height:24px;cursor:pointer}
+  .progress-bar{background:#e9ecef;height:24px;border-radius:12px;overflow:hidden;margin:12px 0}
+  .progress-fill{background:linear-gradient(90deg,#5B9BD5,#28a745);height:100%;transition:width .3s;display:flex;align-items:center;justify-content:center;color:#fff;font-size:12px;font-weight:600}
+  .quote{background:#f8f9fa;border-left:4px solid #5B9BD5;padding:12px 16px;margin:8px 0;font-style:italic;font-size:14px;line-height:1.6;border-radius:4px;white-space:pre-wrap}
+  .blank{background:#fff3cd;padding:0 4px;border-radius:3px;font-weight:600}
+  .tag{display:inline-block;padding:4px 10px;background:#e3eaf3;color:#1F3864;border-radius:12px;font-size:12px;margin:2px 4px 2px 0;font-weight:600}
+  .tag.pro{background:#d4edda;color:#155724}
+  .tag.contra{background:#f8d7da;color:#721c24}
+  .drill-question{font-size:20px;font-weight:700;text-align:center;padding:24px 16px;min-height:120px;display:flex;align-items:center;justify-content:center}
+  .drill-options{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px}
+  .drill-option{padding:16px;background:#fff;border:2px solid #ddd;border-radius:8px;cursor:pointer;font-size:18px;font-weight:600;min-height:60px}
+  .drill-option:active{transform:scale(.97)}
+  .drill-option.correct{background:#d4edda;border-color:#28a745;color:#155724}
+  .drill-option.wrong{background:#f8d7da;border-color:#dc3545;color:#721c24}
+  .drill-stats{display:flex;justify-content:space-around;padding:12px;background:#fff;border-radius:8px;margin-bottom:12px}
+  .drill-stat{text-align:center}
+  .drill-stat .num{font-size:24px;font-weight:700;color:#1F3864}
+  .drill-stat .label{font-size:11px;color:#666}
+  details{background:#fff;border-radius:8px;margin-bottom:8px;padding:12px;box-shadow:0 1px 3px rgba(0,0,0,.06)}
+  details summary{font-weight:600;cursor:pointer;padding:4px;list-style:none}
+  details summary::-webkit-details-marker{display:none}
+  details summary::before{content:'\25B6  ';color:#5B9BD5;display:inline-block}
+  details[open] summary::before{content:'\25BC  '}
+  .home-card{background:linear-gradient(135deg,#1F3864,#2E5984);color:#fff;border-radius:12px;padding:20px;margin-bottom:12px;box-shadow:0 4px 12px rgba(31,56,100,.3)}
+  .home-card h2{color:#fff;border-bottom-color:rgba(255,255,255,.3)}
+  .home-card .big-number{font-size:48px;font-weight:800;text-align:center;margin:12px 0}
+  .home-card .label{text-align:center;font-size:14px;opacity:.9}
+  ul{margin-left:20px;margin-bottom:8px}
+  ul li{margin-bottom:4px}
+  table{width:100%;border-collapse:collapse;margin-bottom:12px;font-size:14px}
+  table th,table td{padding:8px;text-align:left;border-bottom:1px solid #e9ecef}
+  table th{background:#f8f9fa;font-weight:700;color:#1F3864}
+  .topic-card{background:#fff;border-radius:12px;padding:16px;margin-bottom:12px;box-shadow:0 2px 6px rgba(0,0,0,.08)}
+  .arg-list{display:flex;flex-wrap:wrap;gap:4px;margin:8px 0}
+  .template-block{background:#fff8e1;border-left:4px solid #ffc107;padding:12px;border-radius:4px;margin:8px 0;font-size:14px;line-height:1.7}
+  .template-block b{color:#1F3864}
+  .template-block .blank{background:#fff;padding:1px 8px;border-radius:3px;border:1px dashed #999}
+  .alert{padding:12px;border-radius:8px;margin-bottom:12px;font-size:14px}
+  .alert-info{background:#cfe2ff;color:#084298}
+  .alert-warning{background:#fff3cd;color:#664d03}
+  .alert-success{background:#d1e7dd;color:#0f5132}
+  hr{border:none;border-top:1px solid #dee2e6;margin:16px 0}
+  .center{text-align:center}
+  pre{font-family:monospace;font-size:12px;white-space:pre-wrap;line-height:1.5}
+  @media (max-width:360px){.drill-options{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Deutsch Trainer</h1>
+  <div class="subtitle">Hauptschulabschluss - 1-Tag-Crashkurs</div>
+</header>
+
+<main>
+
+<section id="home" class="active">
+  <div class="home-card">
+    <h2>Heute schaffst du das!</h2>
+    <div class="big-number" id="dayProgress">0%</div>
+    <div class="label">deines Trainings geschafft</div>
+    <div class="progress-bar"><div class="progress-fill" id="progressFill" style="width:0%">0/13</div></div>
+  </div>
+  <div class="alert alert-info"><b>Dein Ziel:</b> Du brauchst nur <b>23 von 46 Punkten</b> fuer eine 4. Mit den Vorlagen schaffst du das.</div>
+  <div class="card highlight">
+    <h3>So ist die echte Pruefung aufgebaut</h3>
+    <p>Die Pruefung dauert <b>120 Minuten</b> und hat <b>3 Teile</b> in dieser Reihenfolge:</p>
+    <ol style="margin-left:24px;font-size:14px">
+      <li><b>1. Lesen</b> (Hauptteil 2 - Leseverstehen): Sachtext oder Kurzgeschichte mit Verstaendnisfragen <b>(18 P)</b></li>
+      <li><b>2. Sprache</b> (Sprachgebrauch): Wortarten, Stilmittel, Grammatik <b>(6 P)</b></li>
+      <li><b>3. Schreiben</b> (Wahlteil): EINE Aufgabe waehlen - Stellungnahme, Brief oder Inhaltsangabe <b>(9 P)</b></li>
+    </ol>
+    <p style="font-size:13px;color:#666;margin-top:8px">+ Rechtschreibung (6 P), Sprache & Stil (6 P), Form (1 P) = ueberall verteilt</p>
+    <p style="font-size:13px;color:#666"><b>Hinweis:</b> Hörverstehen (6 P) wurde in dieser App weggelassen, da man dafuer Audio braucht.</p>
+  </div>
+  <h2>Tagesplan - 9:00 bis 20:00</h2>
+  <div id="schedule"></div>
+  <div class="alert alert-warning"><b>Wichtigste Regel:</b> Niemals leer lassen! Schreibe immer etwas.</div>
+  <button class="btn btn-secondary btn-block" onclick="resetProgress()">Fortschritt zuruecksetzen</button>
+</section>
+
+<section id="vorlagen">
+  <h2>Die 3 Vorlagen</h2>
+  <p>Lerne diese auswendig. Sie sind dein Sicherheitsnetz.</p>
+  <details open>
+    <summary>Vorlage 1: Stellungnahme</summary>
+    <div class="template-block">
+      <b>Heutzutage wird oft ueber</b> <span class="blank">[THEMA]</span> <b>diskutiert.</b> Manche Menschen sind dafuer, andere sind dagegen. Im Folgenden moechte ich meine Meinung dazu sagen.<br><br>
+      <b>Ich bin der Meinung, dass</b> <span class="blank">[DEINE MEINUNG]</span><b>.</b><br><br>
+      <b>Erstens</b> <span class="blank">[ARGUMENT 1]</span><b>. Das liegt daran, dass</b> <span class="blank">[BEGRUENDUNG]</span><b>. Zum Beispiel</b> <span class="blank">[BEISPIEL]</span><b>. Daher</b> <span class="blank">[FOLGE]</span><b>.</b><br><br>
+      <b>Zweitens</b> <span class="blank">[ARGUMENT 2]</span><b>. Das zeigt sich daran, dass</b> <span class="blank">[BEGRUENDUNG]</span><b>. Zum Beispiel</b> <span class="blank">[BEISPIEL]</span><b>. Aus diesem Grund</b> <span class="blank">[FOLGE]</span><b>.</b><br><br>
+      <b>Drittens</b> <span class="blank">[ARGUMENT 3]</span><b>. Hierfuer spricht, dass</b> <span class="blank">[BEGRUENDUNG]</span><b>. Ein gutes Beispiel ist</b> <span class="blank">[BEISPIEL]</span><b>. Deshalb</b> <span class="blank">[FOLGE]</span><b>.</b><br><br>
+      <b>Manche Leute sagen zwar, dass</b> <span class="blank">[GEGENARGUMENT]</span><b>. Aber ich finde, dass</b> <span class="blank">[WIDERLEGUNG]</span><b>.</b><br><br>
+      <b>Zusammenfassend bin ich der Meinung, dass</b> <span class="blank">[MEINUNG WIEDERHOLEN]</span><b>. Es waere wichtig, dass</b> <span class="blank">[WUNSCH]</span><b>.</b>
+    </div>
+  </details>
+  <details>
+    <summary>Vorlage 2: Brief</summary>
+    <div class="template-block"><pre>Vorname Nachname
+Strasse + Nummer
+PLZ + Ort
+
+Empfaenger / Firma
+Strasse + Nummer
+PLZ + Ort
+
+                Ort, den TT.MM.JJJJ
+
+Betreff: [Worum geht es]
+
+
+Sehr geehrte Damen und Herren,
+
+ich schreibe Ihnen, weil [GRUND].
+
+Konkret geht es um Folgendes: [PROBLEM].
+Aus diesem Grund [FORDERUNG].
+
+Ich wuerde mich freuen, wenn Sie [BITTE].
+Ueber eine baldige Antwort wuerde ich mich freuen.
+
+
+Mit freundlichen Gruessen
+
+
+Vorname Nachname</pre></div>
+    <div class="alert alert-warning"><b>WICHTIG:</b> Sie/Ihnen immer GROSS. Nach Komma kleines "ich".</div>
+  </details>
+  <details>
+    <summary>Vorlage 3: Inhaltsangabe</summary>
+    <div class="template-block">
+      <b>In dem Sachtext / der Kurzgeschichte "</b><span class="blank">[TITEL]</span><b>" von</b> <span class="blank">[AUTOR]</span><b>, erschienen</b> <span class="blank">[JAHR]</span><b>, geht es um</b> <span class="blank">[THEMA]</span><b>.</b><br><br>
+      <b>Zu Beginn</b> <span class="blank">[WAS PASSIERT ZUERST]</span><b>.</b><br><br>
+      <b>Anschliessend</b> <span class="blank">[WAS PASSIERT IN DER MITTE]</span><b>.</b><br><br>
+      <b>Schliesslich</b> <span class="blank">[WAS PASSIERT AM ENDE]</span><b>.</b><br><br>
+      <b>Insgesamt zeigt der Text, dass</b> <span class="blank">[HAUPTAUSSAGE]</span><b>.</b>
+    </div>
+    <div class="alert alert-warning"><b>WICHTIG:</b> Praesens (Tom geht, nicht Tom ging). Eigene Worte. Keine Meinung.</div>
+  </details>
+</section>
+
+<section id="stellungnahme">
+  <h2>3a. Stellungnahme (Wahlteil)</h2>
+  <div class="alert alert-info"><b>Das kommt zum Schluss.</b> Du waehlst EINE Aufgabe - hier uebst du die haeufigste: Stellungnahme (9 P). Schreibe deinen Text und vergleiche mit dem Muster.</div>
+  <div id="stellungnahmeContent"></div>
+  <div class="btn-row">
+    <button class="btn btn-secondary" onclick="prevStellungnahme()">Vorher</button>
+    <button class="btn" onclick="nextStellungnahme()">Naechstes Thema</button>
+  </div>
+  <div class="center" style="margin-top:8px;font-size:14px;color:#666">
+    Thema <span id="stellungnahmeIndex">1</span> von <span id="stellungnahmeTotal">15</span>
+  </div>
+</section>
+
+<section id="brief">
+  <h2>3b. Brief (Wahlteil)</h2>
+  <div class="alert alert-info"><b>Alternative zur Stellungnahme.</b> Wenn die Schreibaufgabe ein Brief ist - Form ist hier WICHTIG. Sie/Ihnen GROSS, Komma nach Anrede.</div>
+  <div id="briefContent"></div>
+  <div class="btn-row">
+    <button class="btn btn-secondary" onclick="prevBrief()">Vorher</button>
+    <button class="btn" onclick="nextBrief()">Naechstes</button>
+  </div>
+  <div class="center" style="margin-top:8px;font-size:14px;color:#666">
+    Szenario <span id="briefIndex">1</span> von <span id="briefTotal">5</span>
+  </div>
+</section>
+
+<section id="inhaltsangabe">
+  <h2>3c. Inhaltsangabe (Wahlteil)</h2>
+  <div class="alert alert-info"><b>Dritte Alternative.</b> Wenn die Aufgabe eine Inhaltsangabe ist. Praesens! Eigene Worte! Keine Meinung!</div>
+  <div id="inhaltsContent"></div>
+  <div class="btn-row">
+    <button class="btn btn-secondary" onclick="prevInhalts()">Vorher</button>
+    <button class="btn" onclick="nextInhalts()">Naechste</button>
+  </div>
+</section>
+
+<section id="teilA">
+  <h2>1. Lesen (Hauptteil 2)</h2>
+  <div class="alert alert-info"><b>Das kommt zuerst in der Pruefung.</b> Du bekommst einen Text + Fragen dazu (18 Punkte). Beantworte IMMER mit "Im Text steht, dass..."!</div>
+  <div id="teilAContent"></div>
+  <div class="btn-row">
+    <button class="btn btn-secondary" onclick="prevTeilA()">Vorher</button>
+    <button class="btn" onclick="nextTeilA()">Naechster</button>
+  </div>
+  <div class="center" style="margin-top:8px;font-size:14px;color:#666">
+    Text <span id="teilAIndex">1</span> von <span id="teilATotal">5</span>
+  </div>
+</section>
+
+<section id="teilB">
+  <h2>2. Sprache (Sprachgebrauch)</h2>
+  <div class="alert alert-info"><b>Das kommt direkt nach dem Lesen.</b> Wortarten, Stilmittel, Grammatik (6 P) + Rechtschreibung (6 P) = 12 von 46 Punkten!</div>
+  <p>Waehle eine Uebungsart:</p>
+  <button class="btn btn-block" onclick="startDrill('dasdass')">das oder dass? (50 Fragen)</button>
+  <button class="btn btn-block" onclick="startDrill('wortarten')">Wortarten (40 Fragen)</button>
+  <button class="btn btn-block" onclick="startDrill('stilmittel')">Stilmittel (25 Fragen)</button>
+  <button class="btn btn-block" onclick="startDrill('rechtschreibung')">Rechtschreibung (30 Fragen)</button>
+  <div id="drillArea" style="display:none">
+    <div class="drill-stats">
+      <div class="drill-stat"><div class="num" id="drillCorrect">0</div><div class="label">richtig</div></div>
+      <div class="drill-stat"><div class="num" id="drillTotal">0</div><div class="label">total</div></div>
+      <div class="drill-stat"><div class="num" id="drillPercent">0%</div><div class="label">Quote</div></div>
+    </div>
+    <div class="card">
+      <div class="drill-question" id="drillQuestion">Loading...</div>
+      <div class="drill-options" id="drillOptions"></div>
+      <div id="drillFeedback" style="text-align:center;padding:8px;min-height:30px;font-weight:600"></div>
+    </div>
+    <button class="btn btn-secondary btn-block" onclick="endDrill()">Drill beenden</button>
+  </div>
+</section>
+
+<section id="spickzettel">
+  <h2>Spickzettel</h2>
+  <details open>
+    <summary>Standardsaetze (auswendig!)</summary>
+    <div class="quote"><b>Inhaltsfragen:</b> "Im Text steht, dass..."</div>
+    <div class="quote"><b>Zitate:</b> "Im Text wird X zitiert. Er sagt: ... Damit meint er, dass..."</div>
+    <div class="quote"><b>Stilmittel-Wirkung:</b> "Durch die [Stilmittel] wird [Effekt] verstaerkt. Der Leser soll dadurch..."</div>
+    <div class="quote"><b>Inhaltsangabe-Anfang:</b> "In dem Sachtext '...' von [AUTOR] geht es um..."</div>
+    <div class="quote"><b>Stellungnahme-Anfang:</b> "Heutzutage wird oft ueber das Thema [X] diskutiert..."</div>
+    <div class="quote"><b>Brief-Anfang:</b> "Sehr geehrte Damen und Herren, ich schreibe Ihnen, weil..."</div>
+    <div class="quote"><b>Brief-Ende:</b> "Mit freundlichen Gruessen, [Name]"</div>
+  </details>
+  <details>
+    <summary>6 Wortarten</summary>
+    <table>
+      <tr><th>Wortart</th><th>Beispiele</th></tr>
+      <tr><td><b>Nomen</b> (gross!)</td><td>Hund, Liebe, Auto</td></tr>
+      <tr><td><b>Verb</b></td><td>gehen, sein, machen</td></tr>
+      <tr><td><b>Adjektiv</b></td><td>schoen, schnell, rot</td></tr>
+      <tr><td><b>Pronomen</b></td><td>er, sie, es, mein</td></tr>
+      <tr><td><b>Artikel</b></td><td>der, die, das, ein</td></tr>
+      <tr><td><b>Adverb</b></td><td>heute, dort, sehr</td></tr>
+    </table>
+  </details>
+  <details>
+    <summary>5 Stilmittel</summary>
+    <table>
+      <tr><th>Stilmittel</th><th>Beispiel</th></tr>
+      <tr><td><b>Aufzaehlung</b></td><td>rot, gelb, blau</td></tr>
+      <tr><td><b>Wiederholung</b></td><td>Nie, nie wieder</td></tr>
+      <tr><td><b>Vergleich</b></td><td>stark wie ein Baer</td></tr>
+      <tr><td><b>Metapher</b></td><td>Das Leben ist eine Reise</td></tr>
+      <tr><td><b>Rhet. Frage</b></td><td>Wer will das schon?</td></tr>
+    </table>
+    <div class="alert alert-warning"><b>SUPER-TIPP:</b> Aufzaehlung findest du fast immer!</div>
+  </details>
+  <details>
+    <summary>das oder dass?</summary>
+    <div class="alert alert-info">
+      <b>das</b> = Artikel/Pronomen (ersetzbar durch <i>welches/dieses</i>)<br>
+      <b>dass</b> = Bindewort (NICHT ersetzbar)
+    </div>
+  </details>
+  <details>
+    <summary>Zeitplan in der Pruefung (120 Min)</summary>
+    <ul>
+      <li><b>0-10:</b> Aufgaben lesen, Text 1x lesen</li>
+      <li><b>10-20:</b> Text 2x lesen, unterstreichen</li>
+      <li><b>20-45:</b> Teil A - Verstaendnisfragen</li>
+      <li><b>45-65:</b> Teil B - Sprache</li>
+      <li><b>65-105:</b> Teil C - Schreibaufgabe (Vorlage!)</li>
+      <li><b>105-115:</b> Durchlesen, Rechtschreibung pruefen</li>
+      <li><b>115-120:</b> Letzter Check</li>
+    </ul>
+  </details>
+  <details>
+    <summary>Notenschluessel</summary>
+    <table>
+      <tr><th>Punkte</th><th>Note</th></tr>
+      <tr><td>41-46</td><td>1</td></tr>
+      <tr><td>35-40</td><td>2</td></tr>
+      <tr><td>29-34</td><td>3</td></tr>
+      <tr style="background:#d4edda;font-weight:700"><td>23-28</td><td>4 (BESTANDEN!)</td></tr>
+      <tr><td>11-22</td><td>5</td></tr>
+      <tr><td>0-10</td><td>6</td></tr>
+    </table>
+    <div class="alert alert-success">Du brauchst nur die Haelfte!</div>
+  </details>
+  <details>
+    <summary>5 GOLDENE Regeln</summary>
+    <ol style="margin-left:24px">
+      <li><b>NIEMALS LEER LASSEN</b></li>
+      <li><b>EINFACHE SAETZE</b> - kurz und klar</li>
+      <li><b>VORLAGEN BENUTZEN</b></li>
+      <li><b>Sie/Ihnen GROSS</b> im Brief</li>
+      <li><b>PRAESENS</b> in der Inhaltsangabe</li>
+    </ol>
+  </details>
+  <details>
+    <summary>Notfall-Tipps</summary>
+    <ul>
+      <li><b>Multiple Choice unklar?</b> RATE!</li>
+      <li><b>Stilmittel nicht gefunden?</b> Schreibe "Aufzaehlung"</li>
+      <li><b>Argument fehlt?</b> Erfinde ein Beispiel</li>
+      <li><b>Zeit knapp?</b> Schreibaufgabe priorisieren</li>
+    </ul>
+  </details>
+</section>
+
+</main>
+
+<nav class="nav-bottom">
+  <button data-section="home" class="active"><span class="icon">&#127968;</span><span>Plan</span></button>
+  <button data-section="vorlagen"><span class="icon">&#128221;</span><span>Vorlagen</span></button>
+  <button data-section="teilA"><span class="icon">&#128218;</span><span>1. Lesen</span></button>
+  <button data-section="teilB"><span class="icon">&#9889;</span><span>2. Sprache</span></button>
+  <button data-section="stellungnahme"><span class="icon">&#9997;</span><span>3a. Stell.</span></button>
+  <button data-section="brief"><span class="icon">&#9993;</span><span>3b. Brief</span></button>
+  <button data-section="inhaltsangabe"><span class="icon">&#128214;</span><span>3c. Inhalt</span></button>
+  <button data-section="spickzettel"><span class="icon">&#128203;</span><span>Spick</span></button>
+</nav>
+
+<script>
+const SCHEDULE=[
+{t:"09:00",d:"Aufstehen, fruehstuecken, Vorlagen lesen"},
+{t:"10:00",d:"1. LESEN: 3 Texte mit Fragen ueben (Hauptteil 2)"},
+{t:"11:30",d:"Pause - Wasser, Bewegung, Snack"},
+{t:"12:00",d:"2. SPRACHE: das/dass + Wortarten Drill"},
+{t:"13:00",d:"Mittagessen + Pause"},
+{t:"14:00",d:"3. SCHREIBEN: 3 Stellungnahmen ueben"},
+{t:"15:30",d:"1. LESEN: 2 weitere Texte"},
+{t:"16:30",d:"2. SPRACHE: Stilmittel + Rechtschreibung Drill"},
+{t:"17:30",d:"3. SCHREIBEN: 2 Briefe ueben"},
+{t:"18:30",d:"3. SCHREIBEN: 3 weitere Stellungnahmen (Wiederholung!)"},
+{t:"19:30",d:"Spickzettel und Standardsaetze wiederholen"},
+{t:"20:00",d:"Stopp! Frueh schlafen - du hast es geschafft."}
+];
+
+const STELL=[
+{t:"Handys in der Schule",f:"Sollten Smartphones im Schulunterricht erlaubt sein?",
+p:["Helfen beim Lernen","Sicherheit (Eltern erreichbar)","Vorbereitung auf digitale Welt","Lern-Apps moderner"],
+c:["Lenken ab","Schlechtere Noten laut Studien","Mobbing in sozialen Medien","Sucht-Risiko"],
+m:"Heutzutage wird oft ueber das Thema Handys in der Schule diskutiert. Manche Menschen sind dafuer, andere sind dagegen. Im Folgenden moechte ich meine Meinung dazu sagen.\n\nIch bin der Meinung, dass Handys in der Schule erlaubt sein sollten - aber mit Regeln.\n\nErstens helfen Handys beim Lernen. Das liegt daran, dass man im Internet schnell Informationen findet. Zum Beispiel kann man ein neues Wort sofort nachschlagen. Daher sind Handys ein nuetzliches Werkzeug.\n\nZweitens sind Handys wichtig fuer die Sicherheit. Das zeigt sich daran, dass Eltern ihre Kinder im Notfall erreichen muessen. Zum Beispiel wenn die Schule frueher endet. Aus diesem Grund fuehlen sich Familien sicherer.\n\nDrittens muessen Schueler den Umgang mit Handys lernen. Hierfuer spricht, dass Handys auch im Beruf wichtig sind. Ein Beispiel ist das Schreiben von E-Mails. Deshalb sollte die Schule darauf vorbereiten.\n\nManche Leute sagen zwar, dass Handys nur ablenken. Aber ich finde, dass das eine Frage von Regeln ist.\n\nZusammenfassend bin ich der Meinung, dass Handys in der Schule mehr Vorteile haben."},
+{t:"Tiere im Zoo",f:"Sollten Tiere weiterhin in Zoos gehalten werden?",
+p:["Schutz bedrohter Arten","Kinder lernen Tiere kennen","Forschung moeglich","Verletzte Tiere werden gerettet"],
+c:["Wenig Platz","Tiere leiden unter Stress","Tiere gehoeren in die Natur","Filme reichen zum Lernen"],
+m:"Heutzutage wird oft ueber das Thema Tiere im Zoo diskutiert. Manche Menschen sind dafuer, andere sind dagegen.\n\nIch bin der Meinung, dass Tiere in Zoos in besonderen Faellen gehalten werden sollten.\n\nErstens schuetzen Zoos bedrohte Arten. Das liegt daran, dass viele Tiere in der Natur aussterben. Zum Beispiel werden Pandas in Zoos gezuechtet. Daher helfen Zoos beim Tierschutz.\n\nZweitens lernen Kinder im Zoo viel ueber Tiere. Das zeigt sich daran, dass Schulklassen oft Zoos besuchen. Aus diesem Grund sind Zoos lehrreich.\n\nDrittens helfen Zoos verletzten Tieren. Hierfuer spricht, dass Zoos Tiere aufnehmen, die in der Wildnis nicht ueberleben. Deshalb sind Zoos wichtige Schutzorte.\n\nManche Leute sagen zwar, dass Tiere im Zoo leiden. Aber ich finde, dass moderne Zoos viel groessere Gehege haben.\n\nZusammenfassend bin ich der Meinung, dass Zoos eine wichtige Aufgabe haben."},
+{t:"Weniger Fleisch",f:"Sollten wir weniger Fleisch essen?",
+p:["Besser fuer die Umwelt","Tiere leiden weniger","Gemuese ist gesuender","Spart Geld"],
+c:["Fleisch hat Naehrstoffe","Tradition","Bauern verlieren Einkommen","Vegetarisches nicht immer billiger"],
+m:"Heutzutage wird oft ueber das Thema Fleischkonsum diskutiert.\n\nIch bin der Meinung, dass wir weniger Fleisch essen sollten.\n\nErstens schuetzt das die Umwelt. Das liegt daran, dass die Fleischproduktion viel CO2 produziert. Zum Beispiel wird viel Wald abgeholzt. Daher hilft weniger Fleisch dem Klima.\n\nZweitens ist es besser fuer die Gesundheit. Das zeigt sich daran, dass Gemuese viele Vitamine enthaelt. Aus diesem Grund leben Vegetarier oft laenger.\n\nDrittens leiden Tiere weniger. Hierfuer spricht, dass die Massentierhaltung schlechte Bedingungen hat. Deshalb ist weniger Fleisch auch eine ethische Frage.\n\nManche Leute sagen zwar, dass Fleisch wichtige Naehrstoffe enthaelt. Aber ich finde, dass man die auch in pflanzlichen Lebensmitteln findet.\n\nZusammenfassend bin ich der Meinung, dass weniger Fleisch viele Vorteile hat."},
+{t:"Mindestalter Soziale Medien",f:"Sollten Kinder unter 16 keine Sozialen Medien benutzen duerfen?",
+p:["Schutz vor Mobbing","Schutz vor falschen Infos","Mehr Zeit fuer Sport","Bessere mentale Gesundheit"],
+c:["Helfen Freundschaften","Information und Bildung","Verbote werden umgangen","Eltern entscheiden"],
+m:"Heutzutage wird oft ueber das Thema Mindestalter fuer Soziale Medien diskutiert.\n\nIch bin der Meinung, dass Kinder unter 16 keine Sozialen Medien nutzen sollten.\n\nErstens schuetzt das vor Mobbing. Das liegt daran, dass viele Kinder im Internet beleidigt werden. Daher ist ein Verbot ein wichtiger Schutz.\n\nZweitens haben Kinder mehr Zeit fuer Wichtiges. Das zeigt sich daran, dass viele zu viel Zeit am Handy verbringen. Aus diesem Grund ist ein Verbot gut.\n\nDrittens schuetzt es die mentale Gesundheit. Hierfuer spricht, dass viele Kinder durch Soziale Medien depressiv werden. Deshalb sollten sie warten.\n\nManche Leute sagen zwar, dass Verbote umgangen werden. Aber ich finde, dass jedes Hindernis hilft.\n\nZusammenfassend bin ich der Meinung, dass ein Mindestalter sinnvoll ist."},
+{t:"Schuluniform",f:"Sollten alle Schueler in Deutschland eine Schuluniform tragen?",
+p:["Weniger Mobbing wegen Kleidung","Fair fuer arme Familien","Spart Zeit am Morgen","Weniger Markenwerbung"],
+c:["Verlust der Persoenlichkeit","Extra Kosten","Mode ist Selbstausdruck","Tradition gegen Uniformen"],
+m:"Heutzutage wird oft ueber das Thema Schuluniformen diskutiert.\n\nIch bin der Meinung, dass Schuluniformen nicht eingefuehrt werden sollten.\n\nErstens verlieren Schueler ihre Persoenlichkeit. Das liegt daran, dass Kleidung ein wichtiger Teil der Identitaet ist. Daher waere eine Uniform einschraenkend.\n\nZweitens sind Uniformen teuer fuer Eltern. Das zeigt sich daran, dass Eltern extra Geld dafuer ausgeben muessten. Aus diesem Grund waere es eine Belastung.\n\nDrittens hilft Mode beim Lernen sozialer Kompetenzen. Hierfuer spricht, dass Schueler durch Kleidung Akzeptanz lernen. Deshalb sollte Vielfalt erlaubt sein.\n\nManche Leute sagen zwar, dass Uniformen Mobbing verhindern. Aber ich finde, dass Mobbing andere Gruende hat.\n\nZusammenfassend bin ich der Meinung, dass Schuluniformen mehr Nachteile als Vorteile haben."},
+{t:"Plastiktueten verbieten",f:"Sollten Plastiktueten in Deutschland komplett verboten werden?",
+p:["Plastik schadet der Umwelt","Tiere essen Plastik","Stoffbeutel halten laenger","Weniger Muell"],
+c:["Praktisch und billig","Stoffbeutel schwer zu reinigen","Manche vergessen Beutel","Andere Verpackungen schlechter"],
+m:"Heutzutage wird oft ueber das Thema Plastiktueten diskutiert.\n\nIch bin der Meinung, dass Plastiktueten komplett verboten werden sollten.\n\nErstens schaedigt Plastik die Umwelt. Das liegt daran, dass Plastik viele hundert Jahre braucht, um zu zerfallen. Daher belastet jede Tuete unsere Erde.\n\nZweitens sterben Tiere durch Plastik. Das zeigt sich daran, dass viele Voegel und Fische Plastik essen. Aus diesem Grund ist es ein Tierschutzthema.\n\nDrittens gibt es gute Alternativen. Hierfuer spricht, dass Stoffbeutel wiederverwendbar sind. Deshalb braucht es kein Plastik mehr.\n\nManche Leute sagen zwar, dass Plastiktueten praktisch sind. Aber ich finde, dass die Umwelt wichtiger ist.\n\nZusammenfassend bin ich der Meinung, dass ein Plastiktueten-Verbot wichtig ist."},
+{t:"Hausaufgaben abschaffen",f:"Sollten Hausaufgaben abgeschafft werden?",
+p:["Mehr Zeit fuer Hobbys","Weniger Stress","Familien haben mehr Zeit","Kinder lernen ausgeruht besser"],
+c:["Helfen beim Wiederholen","Selbststaendig arbeiten lernen","Lehrer sehen den Lernstand","Vorbereitung auf Beruf"],
+m:"Heutzutage wird oft ueber das Thema Hausaufgaben diskutiert.\n\nIch bin der Meinung, dass Hausaufgaben nicht abgeschafft werden sollten.\n\nErstens helfen sie beim Wiederholen. Das liegt daran, dass das Gehirn Stoff durch Uebung speichert. Daher sind Hausaufgaben ein wichtiger Lernteil.\n\nZweitens lernen Schueler selbststaendig zu arbeiten. Das zeigt sich daran, dass man bei Hausaufgaben alleine Probleme loest. Aus diesem Grund bereiten sie auf das Berufsleben vor.\n\nDrittens sehen Lehrer den Lernstand. Hierfuer spricht, dass Hausaufgaben zeigen, was Schueler verstehen. Deshalb sind sie auch fuer Lehrer wichtig.\n\nManche Leute sagen zwar, dass Hausaufgaben Stress machen. Aber ich finde, dass weniger Stress waere, wenn die Aufgaben kuerzer waeren.\n\nZusammenfassend bin ich der Meinung, dass Hausaufgaben sinnvoll sind."},
+{t:"Wahlalter ab 16",f:"Sollten 16-Jaehrige in Deutschland waehlen duerfen?",
+p:["Politisch interessiert","16 ist reif genug","Junge entscheiden mit","Schon erlaubt in einigen Bundeslaendern"],
+c:["Mit 16 noch nicht erwachsen","Wenig Lebenserfahrung","Eltern beeinflussen","Andere Rechte haengen daran"],
+m:"Heutzutage wird oft ueber das Thema Wahlalter diskutiert.\n\nIch bin der Meinung, dass 16-Jaehrige waehlen duerfen sollten.\n\nErstens sind junge Menschen politisch interessiert. Das liegt daran, dass viele bei Demos fuer Klima oder Gerechtigkeit mitmachen. Daher haben sie eine politische Meinung.\n\nZweitens entscheiden sie mit ueber ihre Zukunft. Das zeigt sich daran, dass Politik vor allem die Jugend betrifft. Aus diesem Grund sollten sie mitreden duerfen.\n\nDrittens funktioniert es schon. Hierfuer spricht, dass einige Bundeslaender das Wahlalter 16 haben. Deshalb ist das Argument der mangelnden Reife widerlegt.\n\nManche Leute sagen zwar, dass 16-Jaehrige zu jung sind. Aber ich finde, dass viele Jugendliche reifer sind als mancher Erwachsener.\n\nZusammenfassend bin ich der Meinung, dass das Wahlalter gesenkt werden sollte."},
+{t:"Mehr Sport in der Schule",f:"Sollten Schulen mehr Stunden Sport pro Woche anbieten?",
+p:["Sport ist gesund","Bewegung hilft beim Lernen","Kinder sitzen zu viel","Verbessert Miteinander"],
+c:["Andere Faecher leiden","Nicht alle moegen Sport","Mehr Hallen noetig","Sport sollte privat sein"],
+m:"Heutzutage wird oft ueber das Thema Sportunterricht diskutiert.\n\nIch bin der Meinung, dass Schulen mehr Sport anbieten sollten.\n\nErstens ist Sport gut fuer die Gesundheit. Das liegt daran, dass viele Kinder zu wenig Bewegung haben. Daher hilft mehr Sport gegen Uebergewicht.\n\nZweitens hilft Bewegung beim Lernen. Das zeigt sich daran, dass Studien Konzentration durch Sport beweisen. Aus diesem Grund ist Sport auch akademisch nuetzlich.\n\nDrittens lernen Kinder Teamarbeit. Hierfuer spricht, dass viele Sportarten Mannschaften brauchen. Deshalb foerdert Sport auch soziale Kompetenzen.\n\nManche Leute sagen zwar, dass andere Faecher wichtiger sind. Aber ich finde, dass Gesundheit die Basis von allem ist.\n\nZusammenfassend bin ich der Meinung, dass mehr Sport wichtig waere."},
+{t:"Stadt vs. Land",f:"Ist es besser, in einer Stadt oder auf dem Land zu leben?",
+p:["Land: Natur, weniger Stress, guenstiger"],
+c:["Stadt: Arbeit, Verkehr, Kultur, aber teuer und laut"],
+m:"Heutzutage wird oft ueber das Thema Stadt oder Land diskutiert.\n\nIch bin der Meinung, dass das Leben auf dem Land besser ist.\n\nErstens hat man mehr Natur. Das liegt daran, dass auf dem Land Waelder und Felder direkt vor der Tuer sind. Daher lebt man gesuender.\n\nZweitens ist es ruhiger. Das zeigt sich daran, dass es weniger Verkehr und Laerm gibt. Aus diesem Grund schlaeft man besser.\n\nDrittens ist es guenstiger. Hierfuer spricht, dass die Mieten viel niedriger sind. Deshalb hat man mehr Geld.\n\nManche Leute sagen zwar, dass das Land langweilig ist. Aber ich finde, dass man auch dort viel machen kann.\n\nZusammenfassend bin ich der Meinung, dass das Land mehr Lebensqualitaet bietet."},
+{t:"Tempolimit",f:"Sollte es ein Tempolimit von 130 km/h auf deutschen Autobahnen geben?",
+p:["Weniger Unfaelle","Weniger CO2","Verkehr fliesst besser","Geringerer Spritverbrauch"],
+c:["Einschraenkung der Freiheit","Autoindustrie betroffen","Laengere Fahrzeiten","Disziplinierte Fahrer"],
+m:"Heutzutage wird oft ueber das Thema Tempolimit diskutiert.\n\nIch bin der Meinung, dass es ein Tempolimit von 130 km/h geben sollte.\n\nErstens passieren weniger Unfaelle. Das liegt daran, dass bei niedrigerer Geschwindigkeit der Bremsweg kuerzer ist. Daher rettet ein Tempolimit Leben.\n\nZweitens ist es besser fuer die Umwelt. Das zeigt sich daran, dass Autos bei 130 km/h viel weniger CO2 produzieren. Aus diesem Grund hilft es dem Klima.\n\nDrittens fliesst der Verkehr besser. Hierfuer spricht, dass die Geschwindigkeitsunterschiede kleiner werden. Deshalb gibt es weniger Staus.\n\nManche Leute sagen zwar, dass Tempolimit die Freiheit einschraenkt. Aber ich finde, dass Sicherheit wichtiger ist.\n\nZusammenfassend bin ich der Meinung, dass ein Tempolimit sinnvoll waere."},
+{t:"Englisch ab 1. Klasse",f:"Sollten Kinder Englisch schon ab der 1. Klasse lernen?",
+p:["Kinder lernen Sprachen schnell","Vorbereitung auf globale Welt","Spielerisches Lernen","Mehr Zeit zum Ueben"],
+c:["Erst Deutsch festigen","Zu viel Druck","Schlechte Aussprache","Lehrer fehlen"],
+m:"Heutzutage wird oft ueber das Thema Englisch in der Grundschule diskutiert.\n\nIch bin der Meinung, dass Englisch ab der 1. Klasse unterrichtet werden sollte.\n\nErstens lernen Kinder Sprachen sehr schnell. Das liegt daran, dass das junge Gehirn flexibel ist. Daher ist frueh besser.\n\nZweitens hilft es im spaeteren Leben. Das zeigt sich daran, dass Englisch in fast allen Berufen wichtig ist. Aus diesem Grund ist es ein Geschenk.\n\nDrittens ist spielerisches Lernen leicht. Hierfuer spricht, dass Kinder durch Lieder und Spiele lernen. Deshalb macht es Spass.\n\nManche Leute sagen zwar, dass erst Deutsch wichtig ist. Aber ich finde, dass beides parallel geht.\n\nZusammenfassend bin ich der Meinung, dass frueh Englisch lernen Vorteile hat."},
+{t:"Wegwerfgesellschaft",f:"Sollten wir die Wegwerfgesellschaft aendern?",
+p:["Weniger Muell","Schutz der Ressourcen","Geld sparen","Werte wiederfinden"],
+c:["Wirtschaft braucht Konsum","Reparatur oft teuer","Neue Produkte besser","Bequemlichkeit"],
+m:"Heutzutage wird oft ueber das Thema Wegwerfgesellschaft diskutiert.\n\nIch bin der Meinung, dass wir die Wegwerfgesellschaft aendern muessen.\n\nErstens schadet sie der Umwelt. Das liegt daran, dass jedes Jahr Tonnen von Muell produziert werden. Daher ist es eine Umweltkatastrophe.\n\nZweitens ist es wirtschaftlicher Unsinn. Das zeigt sich daran, dass viele Produkte schnell kaputt gehen. Aus diesem Grund verlieren wir Geld.\n\nDrittens vergessen wir Werte. Hierfuer spricht, dass frueher Dinge geschaetzt und repariert wurden. Deshalb sollten wir wieder lernen, Sachen zu pflegen.\n\nManche Leute sagen zwar, dass die Wirtschaft Konsum braucht. Aber ich finde, dass nachhaltige Wirtschaft besser ist.\n\nZusammenfassend bin ich der Meinung, dass wir bewusster konsumieren sollten."},
+{t:"Kostenlose Bus & Bahn",f:"Sollte der oeffentliche Nahverkehr kostenlos sein?",
+p:["Schutz der Umwelt","Hilft armen Menschen","Weniger Autos","Gerechtigkeit"],
+c:["Wer bezahlt das?","Volle Bahnen","Geringere Wertschaetzung","Weniger Innovation"],
+m:"Heutzutage wird oft ueber das Thema kostenloser Nahverkehr diskutiert.\n\nIch bin der Meinung, dass Bus und Bahn kostenlos sein sollten.\n\nErstens hilft das der Umwelt. Das liegt daran, dass mehr Menschen Bus und Bahn nehmen wuerden. Daher gaebe es weniger CO2.\n\nZweitens hilft es armen Menschen. Das zeigt sich daran, dass viele sich Tickets kaum leisten koennen. Aus diesem Grund waere es sozial gerecht.\n\nDrittens reduziert es Staus. Hierfuer spricht, dass weniger Autos auf der Strasse waeren. Deshalb waere der Verkehr besser.\n\nManche Leute sagen zwar, dass jemand das bezahlen muss. Aber ich finde, dass die Vorteile hoeher sind als die Kosten.\n\nZusammenfassend bin ich der Meinung, dass kostenloser Nahverkehr eine gute Idee ist."},
+{t:"Ganztagsschule",f:"Sollten alle Schulen Ganztagsschulen werden?",
+p:["Eltern koennen arbeiten","Hausaufgaben in der Schule","Mittagessen mit Freunden","Mehr Zeit fuer AGs"],
+c:["Familien weniger Zeit","Schueler werden mueder","Hoehere Kosten","Kinder brauchen Pausen"],
+m:"Heutzutage wird oft ueber das Thema Ganztagsschule diskutiert.\n\nIch bin der Meinung, dass Ganztagsschulen sinnvoll sind.\n\nErstens helfen sie Familien. Das liegt daran, dass beide Eltern arbeiten koennen. Daher ist es eine Erleichterung.\n\nZweitens werden Hausaufgaben in der Schule gemacht. Das zeigt sich daran, dass es Lehrer gibt, die helfen koennen. Aus diesem Grund ist die Bildung gerechter.\n\nDrittens gibt es mehr Angebote. Hierfuer spricht, dass Schulen AGs fuer Sport, Kunst und Musik anbieten koennen. Deshalb koennen Kinder neue Talente entdecken.\n\nManche Leute sagen zwar, dass Familien dann weniger Zeit haben. Aber ich finde, dass es trotzdem genug Zeit am Abend gibt.\n\nZusammenfassend bin ich der Meinung, dass Ganztagsschulen Vorteile bieten."}
+];
+
+const BRIEF=[
+{t:"Beschwerde wegen falscher Lieferung",s:"Du hast online ein blaues T-Shirt in Groesse M bestellt. Du hast aber ein rotes T-Shirt in Groesse L bekommen. Schreibe einen Beschwerdebrief.",
+m:"Marian Schmidt\nLindenstrasse 23\n30159 Hannover\n\nMode-Versand GmbH\nHauptstrasse 45\n20095 Hamburg\n\n                Hannover, den 12. Mai 2026\n\nBetreff: Beschwerde wegen falscher Lieferung\n\nSehr geehrte Damen und Herren,\n\nich schreibe Ihnen, weil ich am 1. Mai 2026 in Ihrem Online-Shop ein blaues T-Shirt in Groesse M bestellt habe (Bestellnummer 4521).\n\nKonkret geht es um Folgendes: Heute kam mein Paket. Leider habe ich ein rotes T-Shirt in Groesse L bekommen.\n\nAus diesem Grund bitte ich Sie, mir das richtige Produkt schnell zuzusenden und das falsche T-Shirt wieder abzuholen.\n\nIch wuerde mich freuen, wenn Sie sich bald bei mir melden.\n\nMit freundlichen Gruessen\n\nMarian Schmidt"},
+{t:"Bewerbung Praktikum Baeckerei",s:"Du moechtest ein zweiwoechiges Praktikum in einer Baeckerei machen. Schreibe einen Brief.",
+m:"Anna Mueller\nBlumenweg 12\n30159 Hannover\n\nBaeckerei Schmidt\nHauptstrasse 8\n30159 Hannover\n\n                Hannover, den 12. Mai 2026\n\nBetreff: Bewerbung fuer ein Praktikum\n\nSehr geehrte Damen und Herren,\n\nich schreibe Ihnen, weil ich gerne ein zweiwoechiges Praktikum in Ihrer Baeckerei machen moechte. Ich besuche zurzeit die Hauptschule Hannover in der 9. Klasse.\n\nKonkret geht es um Folgendes: Ich interessiere mich sehr fuer das Baeckerhandwerk. Ich wuerde gerne lernen, wie Brot und Broetchen gebacken werden.\n\nAus diesem Grund bitte ich Sie um die Moeglichkeit, ein Praktikum vom 15.06. bis 26.06.2026 zu machen.\n\nIch wuerde mich sehr freuen, wenn Sie mir die Moeglichkeit geben.\n\nMit freundlichen Gruessen\n\nAnna Mueller"},
+{t:"Beschwerde Stadt (Muell)",s:"In deinem Stadtteil liegt seit Wochen viel Muell auf den Strassen. Schreibe einen Brief an die Stadtverwaltung.",
+m:"Tom Weber\nLindenstrasse 45\n30159 Hannover\n\nStadtverwaltung Hannover\nRathausstrasse 1\n30159 Hannover\n\n                Hannover, den 12. Mai 2026\n\nBetreff: Beschwerde wegen Muell\n\nSehr geehrte Damen und Herren,\n\nich schreibe Ihnen, weil in meinem Stadtteil seit Wochen viel Muell auf den Strassen liegt. Das ist nicht nur unschoen, sondern auch ungesund.\n\nKonkret geht es um Folgendes: Vor allem in der Lindenstrasse sind die Muelleimer oft voll. Plastiktueten und Papier liegen ueberall.\n\nAus diesem Grund bitte ich Sie, mehr Muelleimer aufzustellen und sie oefter leeren zu lassen.\n\nIch wuerde mich freuen, wenn Sie schnell handeln.\n\nMit freundlichen Gruessen\n\nTom Weber"},
+{t:"Anfrage Sportverein",s:"Du moechtest in einen Fussballverein eintreten. Schreibe einen Brief und frage nach Preis, Trainingszeiten und Ausruestung.",
+m:"Lisa Bauer\nGartenstrasse 8\n30159 Hannover\n\nFC Hannover\nSportplatz Nord 1\n30159 Hannover\n\n                Hannover, den 12. Mai 2026\n\nBetreff: Anfrage zur Mitgliedschaft\n\nSehr geehrte Damen und Herren,\n\nich schreibe Ihnen, weil ich gerne in Ihren Fussballverein eintreten moechte. Ich bin 16 Jahre alt und spiele seit drei Jahren Fussball.\n\nKonkret geht es um Folgendes: Wie viel kostet der Mitgliedsbeitrag? Wann sind die Trainingszeiten? Welche Ausruestung brauche ich?\n\nAus diesem Grund bitte ich Sie um Informationen zu diesen Punkten.\n\nIch wuerde mich freuen, wenn Sie mir bald antworten koennten.\n\nMit freundlichen Gruessen\n\nLisa Bauer"},
+{t:"Beschwerde Vermieter",s:"In deiner Wohnung tropft seit zwei Wochen der Wasserhahn. Schreibe einen Brief an den Vermieter.",
+m:"Familie Klein\nRosenweg 7\n30159 Hannover\n\nHerr Hans Mueller\nHauptstrasse 22\n30159 Hannover\n\n                Hannover, den 12. Mai 2026\n\nBetreff: Defekter Wasserhahn\n\nSehr geehrter Herr Mueller,\n\nich schreibe Ihnen, weil seit zwei Wochen der Wasserhahn in unserer Kueche tropft. Ich habe Sie bereits am 28. April telefonisch informiert.\n\nKonkret geht es um Folgendes: Der Wasserhahn tropft Tag und Nacht. Das verursacht hohe Wasserkosten.\n\nAus diesem Grund bitte ich Sie, schnell einen Klempner zu schicken.\n\nIch wuerde mich freuen, wenn das Problem bis Ende der Woche geloest werden kann.\n\nMit freundlichen Gruessen\n\nFamilie Klein"}
+];
+
+const INHALTS=[
+{t:"Der letzte Bus",a:"Lena Hoffmann",j:"2022",
+text:"Tom stand an der Bushaltestelle und schaute auf sein Handy. Es war kurz vor Mitternacht.\n\nDer Tag war lang gewesen. Schule, dann Arbeit im Supermarkt, dann lernen. Tom war muede, hungrig und genervt.\n\nAuf der Bank gegenueber sass ein aelterer Mann. Sein Mantel war zu gross. Sein Hut war alt. Seine Schuhe waren schmutzig.\n\nPloetzlich sprach der Mann ihn an: Junger Mann, haben Sie vielleicht einen Euro? Ich moechte mir einen Tee kaufen.\n\nTom seufzte. Aber dann sah er die Augen des Mannes. Sie waren freundlich - wie die Augen seines Grossvaters.\n\nTom griff in seine Tasche und holte einen Fuenf-Euro-Schein heraus. Hier, sagte er. Kaufen Sie sich was Warmes.\n\nDer Mann laechelte.\n\nIn diesem Moment kam der Bus. Tom stieg ein. Manchmal, dachte er, braucht es nur einen kleinen Moment, um alles zu veraendern.",
+m:"In der Kurzgeschichte 'Der letzte Bus' von Lena Hoffmann aus dem Jahr 2022 geht es um eine kleine Begegnung zwischen einem genervten Schueler und einem alten Mann.\n\nZu Beginn steht Tom kurz vor Mitternacht an einer Bushaltestelle. Er ist muede und genervt. Auf der Bank gegenueber sitzt ein alter, aermlich gekleideter Mann.\n\nAnschliessend bittet der Mann Tom um einen Euro fuer einen Tee. Erst ist Tom genervt. Aber als er in die Augen des Mannes schaut, erinnert er sich an seinen Grossvater. Aus diesem Grund gibt er dem Mann fuenf Euro.\n\nSchliesslich kommt der Bus. Tom steigt ein. Das Genervtsein ist verschwunden.\n\nInsgesamt zeigt der Text, dass auch kleine Begegnungen unser Leben veraendern koennen."},
+{t:"Die Entscheidung",a:"Anna Berger",j:"2023",
+text:"Lara sass auf der Bank im Park. In ihrer Hand hielt sie zwei Briefe.\n\nDer erste Brief war von einer Universitaet in Berlin. Lara konnte dort Medizin studieren. Das war ihr Traum.\n\nDer zweite Brief war von einer Tanzschule in Muenchen. Tanzen war ihre groesste Leidenschaft.\n\nIhre Mutter sagte: Studiere Medizin. Ihr Vater sagte: Tanze.\n\nDann fiel ihr ein Satz ihrer Grossmutter ein: Folge deinem Herzen.\n\nLara stand auf. Sie nahm den Brief der Tanzschule. Den Brief der Universitaet liess sie auf der Bank liegen. Mit einem Laecheln ging sie nach Hause.",
+m:"In der Kurzgeschichte 'Die Entscheidung' von Anna Berger aus dem Jahr 2023 geht es um eine junge Frau, die zwischen zwei Lebenswegen waehlen muss.\n\nZu Beginn sitzt Lara auf einer Bank im Park und haelt zwei Briefe in der Hand. Der eine ist von einer Universitaet, der andere von einer Tanzschule.\n\nAnschliessend denkt Lara nach. Ihre Familie gibt unterschiedliche Ratschlaege.\n\nSchliesslich erinnert sie sich an einen Satz ihrer Grossmutter und entscheidet sich fuer die Tanzschule.\n\nInsgesamt zeigt der Text, dass es wichtig ist, dem eigenen Herzen zu folgen."},
+{t:"Der gefundene Brief",a:"Markus Klein",j:"2024",
+text:"Es war ein regnerischer Sonntag. Anna raeumte den alten Schrank ihrer Grossmutter auf.\n\nIn einer Schublade fand Anna eine Holzkiste. In der Kiste lagen alte Fotos, ein Ring und ein Brief.\n\nLiebe Anna, begann der Brief. Wenn du diesen Brief liest, bin ich nicht mehr da.\n\nDie Grossmutter schrieb von ihrem Leben. Vom Krieg, von ihrer grossen Liebe, die frueh gestorben war. Von Traeumen, die sie nie verwirklicht hatte.\n\nAm Ende stand: Lebe deine Traeume, Anna. Warte nicht zu lange.\n\nAn diesem Sonntag nahm Anna eine Entscheidung. Sie wuerde ihre Traeume nicht mehr aufschieben.",
+m:"In der Kurzgeschichte 'Der gefundene Brief' von Markus Klein aus dem Jahr 2024 geht es um eine junge Frau, die durch einen Brief ihrer verstorbenen Grossmutter eine wichtige Entscheidung trifft.\n\nZu Beginn raeumt Anna den Schrank ihrer Grossmutter auf. In einer Schublade findet sie eine Holzkiste mit alten Fotos und einem Brief.\n\nAnschliessend liest Anna den Brief. Die Grossmutter erzaehlt von ihrem schweren Leben und von Traeumen, die sie nie verwirklicht hat.\n\nSchliesslich raet die Grossmutter Anna, ihre eigenen Traeume zu leben.\n\nInsgesamt zeigt der Text, dass man im Leben mutig sein und seine Traeume verfolgen sollte."}
+];
+
+const TEILA=[
+{t:"Klima und Umwelt",
+text:"Der Klimawandel ist eine grosse Gefahr fuer unseren Planeten. Die Erde wird immer waermer. Vor allem das Verbrennen von Kohle, Oel und Gas spielt eine wichtige Rolle. Auch Autos und Flugzeuge tragen zum Problem bei.\n\nDie Folgen sind schon heute zu sehen. Die Eisberge schmelzen. Das Meer steigt. Es gibt mehr Stuerme und mehr Hitze.\n\nWir muessen jetzt handeln, sagt die Umweltforscherin Dr. Maria Klein.\n\nWas kann man tun? Experten geben Tipps: weniger Auto fahren, mehr Fahrrad nutzen, weniger Fleisch essen.",
+q:[
+{f:"Welche Gruende fuer den Klimawandel werden genannt?",a:"Im Text werden mehrere Gruende genannt: das Verbrennen von Kohle, Oel und Gas. Auch Autos und Flugzeuge tragen zum Problem bei."},
+{f:"Welche Folgen hat der Klimawandel?",a:"Im Text werden viele Folgen genannt: Die Eisberge schmelzen, das Meer steigt, es gibt mehr Stuerme und Hitze."},
+{f:"Wer wird im Text zitiert?",a:"Im Text wird Dr. Maria Klein zitiert. Sie sagt: Wir muessen jetzt handeln."},
+{f:"Welche Tipps geben Experten?",a:"Experten geben folgende Tipps: weniger Auto fahren, mehr Fahrrad nutzen, weniger Fleisch essen."}
+]},
+{t:"Soziale Medien",
+text:"Soziale Medien wie Instagram und TikTok sind aus dem Leben vieler Jugendlicher nicht mehr wegzudenken. Ueber 90 Prozent der Jugendlichen sind taeglich online. Sie verbringen drei Stunden pro Tag in sozialen Netzwerken.\n\nDie Vorteile sind klar. Junge Menschen koennen mit Freunden in Kontakt bleiben. Sie sehen lustige Videos und lernen Neues.\n\nAber es gibt auch Probleme. Viele Jugendliche fuehlen sich unter Druck. Auch Mobbing im Netz nimmt zu.\n\nEltern und Schulen muessen mehr aufklaeren, sagt der Jugendpsychologe Peter Mueller.",
+q:[
+{f:"Wie viele Jugendliche sind taeglich online?",a:"Im Text steht, dass ueber 90 Prozent der Jugendlichen taeglich online sind. Sie verbringen drei Stunden pro Tag in sozialen Netzwerken."},
+{f:"Welche Vorteile haben Soziale Medien?",a:"Die Vorteile sind: Kontakt mit Freunden, lustige Videos, Neues lernen."},
+{f:"Welche Probleme werden genannt?",a:"Probleme sind: Druck immer perfekt auszusehen, Mobbing im Netz."},
+{f:"Was sagt Peter Mueller?",a:"Im Text wird Peter Mueller zitiert. Er sagt: Eltern und Schulen muessen mehr aufklaeren."}
+]},
+{t:"Gesunde Ernaehrung",
+text:"Was ist gesundes Essen? Experten sind sich einig: viel Obst und Gemuese, wenig Zucker und wenig Fett.\n\nViele Menschen in Deutschland essen zu wenig Gemuese. Sie essen lieber Fertiggerichte und Fast Food. Die Folgen sind Uebergewicht, Diabetes und Herzkrankheiten.\n\nKochen kann jeder lernen, sagt die Ernaehrungsberaterin Anna Berger.\n\nExperten raten: jeden Tag fuenf Portionen Obst und Gemuese, viel Wasser trinken, mehr selbst kochen.",
+q:[
+{f:"Was sagen Experten zu gesundem Essen?",a:"Experten sagen: viel Obst und Gemuese, wenig Zucker und wenig Fett."},
+{f:"Welche Folgen hat ungesundes Essen?",a:"Die Folgen sind Uebergewicht, Diabetes und Herzkrankheiten."},
+{f:"Was sagt Anna Berger?",a:"Im Text wird Anna Berger zitiert. Sie sagt: Kochen kann jeder lernen."},
+{f:"Welche Tipps geben Experten?",a:"Experten raten zu fuenf Portionen Obst und Gemuese, viel Wasser, selbst kochen."}
+]},
+{t:"Tiere im Tierheim",
+text:"In Deutschland leben viele Hunde und Katzen im Tierheim. Manche Tiere wurden ausgesetzt. Andere Familien koennen sich das Tier nicht mehr leisten.\n\nDie Mitarbeiter im Tierheim arbeiten hart. Sie fuettern die Tiere und geben Liebe.\n\nJedes Tier verdient ein gutes Zuhause, sagt die Tierheim-Leiterin Sandra Lutz.\n\nWer ein Tier holen moechte, sollte sich gut ueberlegen. Ein Tier braucht Zeit, Geld und Liebe.",
+q:[
+{f:"Aus welchen Gruenden kommen Tiere ins Tierheim?",a:"Die Gruende sind: Tiere wurden ausgesetzt, Familien koennen sich das Tier nicht leisten."},
+{f:"Was machen die Mitarbeiter?",a:"Die Mitarbeiter fuettern die Tiere und geben ihnen Liebe."},
+{f:"Was sagt Sandra Lutz?",a:"Im Text wird Sandra Lutz zitiert. Sie sagt: Jedes Tier verdient ein gutes Zuhause."},
+{f:"Was sollte man ueberlegen, bevor man ein Tier holt?",a:"Man sollte ueberlegen: Ein Tier braucht Zeit, Geld und Liebe."}
+]},
+{t:"Kuenstliche Intelligenz",
+text:"Kuenstliche Intelligenz, kurz KI, ist heute ueberall. Im Handy, im Computer, im Auto.\n\nViele Menschen nutzen KI jeden Tag. Zum Beispiel Sprachassistenten wie Siri.\n\nAber KI hat auch Nachteile. Manche Menschen verlieren ihre Arbeit. Ausserdem kann KI Fehler machen.\n\nWir muessen KI verstehen, nicht fuerchten, erklaert der Informatiker Dr. Lukas Berger.",
+q:[
+{f:"Wo nutzen Menschen KI?",a:"Beispiele: Sprachassistenten wie Siri, Online-Einkauf."},
+{f:"Welche Nachteile hat KI?",a:"Nachteile: Menschen verlieren ihre Arbeit, KI kann Fehler machen."},
+{f:"Was sagt Dr. Berger?",a:"Im Text wird Dr. Berger zitiert. Er sagt: Wir muessen KI verstehen, nicht fuerchten."},
+{f:"Was kann KI?",a:"KI kann sprechen, schreiben und Bilder erkennen."}
+]}
+];
+
+const D_DASS=[
+["Ich glaube, ___ er recht hat.",["das","dass"],1],
+["___ Buch liegt auf dem Tisch.",["Das","Dass"],0],
+["Ich habe gesehen, ___ du da warst.",["das","dass"],1],
+["Sie liebt ___ Kleid.",["das","dass"],0],
+["Es ist gut, ___ wir uns wiedersehen.",["das","dass"],1],
+["Ich weiss nicht, ___ er kommt.",["das","dass"],1],
+["___ Wetter ist heute schoen.",["Das","Dass"],0],
+["Tom hofft, ___ er die Pruefung besteht.",["das","dass"],1],
+["Schau dir ___ an!",["das","dass"],0],
+["Es freut mich, ___ du da bist.",["das","dass"],1],
+["___ Auto, ___ rot ist, gehoert mir.",["Das, das","Dass, dass"],0],
+["Mama sagt, ___ ich aufraeumen muss.",["das","dass"],1],
+["Wir hoffen, ___ alles gut wird.",["das","dass"],1],
+["___ Kind weint.",["Das","Dass"],0],
+["Anna will, ___ wir kommen.",["das","dass"],1],
+["Magst du ___ Buch?",["das","dass"],0],
+["Es war klar, ___ er Recht hatte.",["das","dass"],1],
+["Wo ist ___ Geld?",["das","dass"],0],
+["Ich finde, ___ er nett ist.",["das","dass"],1],
+["Er sagt, ___ er muede sei.",["das","dass"],1],
+["___ ist nicht schwer.",["Das","Dass"],0],
+["Wir hoffen, ___ es klappt.",["das","dass"],1],
+["Das Problem ist, ___ er nicht hoert.",["das","dass"],1],
+["___ ist wirklich schade.",["Das","Dass"],0],
+["Tom will, ___ wir alle kommen.",["das","dass"],1],
+["Schau, ___ Vogel dort!",["das","dass"],0],
+["Ich schaffe es, ___ ich puenktlich bin.",["das","dass"],1],
+["___ Haus ist gross.",["Das","Dass"],0],
+["Er hofft, ___ er gewinnt.",["das","dass"],1],
+["Es ist schade, ___ du gehst.",["das","dass"],1],
+["Ich weiss, ___ du kommst.",["das","dass"],1],
+["___ ist mir egal.",["Das","Dass"],0],
+["Wir freuen uns, ___ du da bist.",["das","dass"],1],
+["Mama hat gekocht. ___ war lecker!",["Das","Dass"],0],
+["Lara sagt, ___ sie krank ist.",["das","dass"],1],
+["Lies ___ Buch!",["das","dass"],0],
+["Ich denke, ___ es regnen wird.",["das","dass"],1],
+["___ war ein langer Tag.",["Das","Dass"],0],
+["Tom glaubt, ___ er gewinnt.",["das","dass"],1],
+["Es ist wichtig, ___ du uebst.",["das","dass"],1],
+["___ Kleid ist neu.",["Das","Dass"],0],
+["Sie hofft, ___ er anruft.",["das","dass"],1],
+["___ Bild gefaellt mir.",["Das","Dass"],0],
+["Es ist gut, ___ du gesund bist.",["das","dass"],1],
+["Anna weiss, ___ sie geht.",["das","dass"],1],
+["___ war eine gute Idee.",["Das","Dass"],0],
+["Wir wuenschen, ___ alles gut wird.",["das","dass"],1],
+["___ ist mein Auto.",["Das","Dass"],0],
+["Es ist toll, ___ du da bist.",["das","dass"],1],
+["___ Eis schmeckt gut.",["Das","Dass"],0],
+["Ich glaube, ___ es regnet.",["das","dass"],1]
+];
+
+const D_WORTARTEN=[
+["der",["Nomen","Artikel","Verb","Adjektiv"],1],
+["Hund",["Verb","Adjektiv","Nomen","Adverb"],2],
+["schnell",["Verb","Adjektiv","Nomen","Pronomen"],1],
+["gehen",["Nomen","Adjektiv","Verb","Adverb"],2],
+["heute",["Nomen","Adverb","Verb","Pronomen"],1],
+["ich",["Nomen","Artikel","Pronomen","Verb"],2],
+["Liebe",["Verb","Adjektiv","Nomen","Adverb"],2],
+["rot",["Adjektiv","Verb","Nomen","Adverb"],0],
+["und",["Adverb","Konjunktion","Verb","Nomen"],1],
+["die",["Pronomen","Artikel","Verb","Nomen"],1],
+["schoen",["Adjektiv","Verb","Nomen","Pronomen"],0],
+["Mann",["Adjektiv","Verb","Nomen","Pronomen"],2],
+["schlafen",["Verb","Nomen","Adjektiv","Adverb"],0],
+["sehr",["Verb","Adverb","Nomen","Pronomen"],1],
+["ein",["Pronomen","Artikel","Verb","Adjektiv"],1],
+["wir",["Pronomen","Artikel","Verb","Nomen"],0],
+["machen",["Nomen","Verb","Adjektiv","Pronomen"],1],
+["gross",["Verb","Nomen","Adjektiv","Adverb"],2],
+["Auto",["Verb","Adjektiv","Nomen","Pronomen"],2],
+["kalt",["Adjektiv","Verb","Nomen","Pronomen"],0],
+["lesen",["Nomen","Verb","Adjektiv","Adverb"],1],
+["mein",["Artikel","Pronomen","Verb","Nomen"],1],
+["dort",["Verb","Nomen","Adverb","Pronomen"],2],
+["Frau",["Verb","Adjektiv","Nomen","Pronomen"],2],
+["sein",["Verb","Nomen","Adjektiv","Adverb"],0],
+["klein",["Adjektiv","Verb","Nomen","Adverb"],0],
+["morgen",["Verb","Adverb","Nomen","Pronomen"],1],
+["trinken",["Nomen","Verb","Adjektiv","Adverb"],1],
+["Kind",["Verb","Adjektiv","Nomen","Pronomen"],2],
+["fleissig",["Adjektiv","Verb","Nomen","Adverb"],0],
+["du",["Artikel","Pronomen","Verb","Nomen"],1],
+["muede",["Verb","Nomen","Adjektiv","Adverb"],2],
+["lachen",["Nomen","Verb","Adjektiv","Adverb"],1],
+["neu",["Adjektiv","Verb","Nomen","Adverb"],0],
+["Schule",["Verb","Adjektiv","Nomen","Pronomen"],2],
+["schlecht",["Verb","Adjektiv","Nomen","Pronomen"],1],
+["gerne",["Verb","Adverb","Nomen","Pronomen"],1],
+["Brot",["Verb","Adjektiv","Nomen","Pronomen"],2],
+["alt",["Adjektiv","Verb","Nomen","Adverb"],0],
+["essen",["Nomen","Verb","Adjektiv","Adverb"],1]
+];
+
+const D_STILMITTEL=[
+["rot, gelb, blau und gruen",["Aufzaehlung","Vergleich"],0],
+["stark wie ein Baer",["Vergleich","Wiederholung"],0],
+["Niemals, niemals!",["Aufzaehlung","Wiederholung"],1],
+["Wer will das schon?",["Vergleich","Rhetorische Frage"],1],
+["Das Leben ist eine Reise",["Aufzaehlung","Metapher"],1],
+["schnell wie der Wind",["Vergleich","Metapher"],0],
+["Hilfe! Hilfe! Hilfe!",["Aufzaehlung","Wiederholung"],1],
+["Glaubt das jemand wirklich?",["Metapher","Rhetorische Frage"],1],
+["Mein Herz schlaegt fuer dich",["Vergleich","Metapher"],1],
+["Brot, Kaese, Wurst und Milch",["Aufzaehlung","Wiederholung"],0],
+["Wer haette das gedacht?",["Aufzaehlung","Rhetorische Frage"],1],
+["klug wie ein Fuchs",["Vergleich","Metapher"],0],
+["Genug ist genug!",["Wiederholung","Vergleich"],0],
+["Die Hoffnung ist ein Licht",["Vergleich","Metapher"],1],
+["Tag fuer Tag, Stunde fuer Stunde",["Aufzaehlung","Wiederholung"],1],
+["Ist das wirklich noetig?",["Metapher","Rhetorische Frage"],1],
+["Hund, Katze, Maus",["Aufzaehlung","Wiederholung"],0],
+["weiss wie Schnee",["Vergleich","Metapher"],0],
+["Niemand, niemand will das",["Aufzaehlung","Wiederholung"],1],
+["Sein Herz ist aus Stein",["Vergleich","Metapher"],1],
+["Soll das so bleiben?",["Aufzaehlung","Rhetorische Frage"],1],
+["Gold, Silber, Bronze",["Aufzaehlung","Wiederholung"],0],
+["muede wie ein Hund",["Vergleich","Metapher"],0],
+["Er ist ein Loewe im Kampf",["Vergleich","Metapher"],1],
+["Genug, genug, genug!",["Aufzaehlung","Wiederholung"],1]
+];
+
+const D_RECHT=[
+["Ich gehe zur ___.",["Schule","schule"],0],
+["___ ist das?",["was","Was"],1],
+["Ihr ___ alle willkommen.",["seit","seid"],1],
+["___ gestern bin ich krank.",["Seit","Seid"],0],
+["Wir treffen uns ___.",["wieder","wider"],0],
+["Mein ___ heisst Anton.",["bruder","Bruder"],1],
+["Die ___ scheint hell.",["sonne","Sonne"],1],
+["Ich ___ dich gerne.",["liebe","Liebe"],0],
+["Sie ___ sehr nett.",["sind","Sind"],0],
+["___ Hund bellt.",["der","Der"],1],
+["Ich danke ___ sehr.",["ihnen","Ihnen"],1],
+["Das Buch ___ auf dem Tisch.",["ligt","liegt"],1],
+["Sie hat einen schoenen ___.",["hut","Hut"],1],
+["Der Brief kommt aus ___.",["berlin","Berlin"],1],
+["Ich ___ einen Hund.",["habe","Habe"],0],
+["Sehr geehrte Damen, ___ schreibe Ihnen.",["Ich","ich"],1],
+["Mit freundlichen ___.",["gruessen","Gruessen"],1],
+["Heute ist ___ Wetter.",["schoenes","Schoenes"],0],
+["Ich freue mich auf ___.",["sie","Sie"],1],
+["Die ___ Kinder spielen.",["kleinen","Kleinen"],0],
+["Anna ___ einen Apfel.",["isst","ist"],0],
+["Wir gehen zum ___.",["see","See"],1],
+["Tom ___ gerne.",["lacht","Lacht"],0],
+["Ich sehe ___ Fahrrad.",["mein","Mein"],0],
+["___ alle gemeinsam!",["lasst uns","Lasst uns"],1],
+["Der Hund ___ dem Kind.",["folgt","Folgt"],0],
+["Mein ___ ist 16 Jahre alt.",["bruder","Bruder"],1],
+["Sie hat eine ___.",["familie","Familie"],1],
+["Wir gehen am ___ schwimmen.",["samstag","Samstag"],1],
+["___ ist mein Geburtstag.",["heute","Heute"],1]
+];
+
+let stIdx=0,brIdx=0,inIdx=0,taIdx=0;
+let drillData=null,drillIdx=0,drillCorrect=0,drillTotal=0;
+const KEY="dt_v3";
+function ls(){try{return JSON.parse(localStorage.getItem(KEY)||"{}")}catch(e){return{}}}
+function ss(d){localStorage.setItem(KEY,JSON.stringify(d))}
+
+function showSection(name){
+  document.querySelectorAll("section").forEach(s=>s.classList.remove("active"));
+  document.getElementById(name).classList.add("active");
+  document.querySelectorAll(".nav-bottom button").forEach(b=>b.classList.remove("active"));
+  document.querySelector('.nav-bottom button[data-section="'+name+'"]').classList.add("active");
+  window.scrollTo(0,0);
+}
+document.querySelectorAll(".nav-bottom button").forEach(b=>{
+  b.addEventListener("click",function(){showSection(b.dataset.section)});
+});
+
+function escapeHtml(s){return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;")}
+
+function renderSchedule(){
+  var state=ls(),done=state.sch||{};
+  var html=SCHEDULE.map(function(item,i){
+    return '<div class="schedule-item '+(done[i]?"done":"")+'">'+
+      '<input type="checkbox" '+(done[i]?"checked":"")+' onchange="toggleSch('+i+',this.checked)">'+
+      '<div class="time">'+item.t+'</div>'+
+      '<div class="desc">'+escapeHtml(item.d)+'</div>'+
+      '</div>';
+  }).join("");
+  document.getElementById("schedule").innerHTML=html;
+  updateProgress();
+}
+function toggleSch(i,c){var s=ls();s.sch=s.sch||{};s.sch[i]=c;ss(s);renderSchedule()}
+function updateProgress(){
+  var s=ls(),d=s.sch||{};
+  var total=SCHEDULE.length,done=Object.values(d).filter(function(v){return v}).length;
+  var pct=Math.round(done/total*100);
+  document.getElementById("dayProgress").textContent=pct+"%";
+  document.getElementById("progressFill").style.width=pct+"%";
+  document.getElementById("progressFill").textContent=done+"/"+total;
+}
+function resetProgress(){
+  if(confirm("Wirklich alles zuruecksetzen?")){localStorage.removeItem(KEY);renderSchedule()}
+}
+
+function updateWordCount(ta,id,goal){
+  var w=ta.value.trim().split(/\s+/).filter(function(x){return x.length>0}).length;
+  var el=document.getElementById(id);
+  el.textContent=w+" Woerter (Ziel: "+goal+"+)";
+  el.classList.toggle("good",w>=goal);
+}
+
+function renderStell(){
+  var t=STELL[stIdx];
+  document.getElementById("stellungnahmeIndex").textContent=stIdx+1;
+  document.getElementById("stellungnahmeTotal").textContent=STELL.length;
+  var saved=(ls().stell||{})[stIdx]||"";
+  var h='<div class="topic-card"><h3>'+escapeHtml(t.t)+'</h3><p><b>'+escapeHtml(t.f)+'</b></p>';
+  h+='<h4>Pro-Argumente</h4><div class="arg-list">'+t.p.map(function(x){return '<span class="tag pro">'+escapeHtml(x)+'</span>'}).join("")+'</div>';
+  h+='<h4>Contra-Argumente</h4><div class="arg-list">'+t.c.map(function(x){return '<span class="tag contra">'+escapeHtml(x)+'</span>'}).join("")+'</div></div>';
+  h+='<div class="card"><h4>Schreibe deine Stellungnahme:</h4>';
+  h+='<textarea id="stText" placeholder="Heutzutage wird oft ueber das Thema..." oninput="updateWordCount(this,&quot;stWC&quot;,200)">'+escapeHtml(saved)+'</textarea>';
+  h+='<div class="word-count" id="stWC">0 Woerter (Ziel: 200+)</div>';
+  h+='<button class="btn btn-success btn-block" style="margin-top:8px" onclick="saveStell()">Speichern</button></div>';
+  h+='<details><summary>Musterloesung anzeigen</summary><div class="quote">'+escapeHtml(t.m)+'</div></details>';
+  document.getElementById("stellungnahmeContent").innerHTML=h;
+  var ta=document.getElementById("stText");
+  if(ta)updateWordCount(ta,"stWC",200);
+}
+function saveStell(){var s=ls();s.stell=s.stell||{};s.stell[stIdx]=document.getElementById("stText").value;ss(s);alert("Gespeichert!")}
+function nextStellungnahme(){stIdx=(stIdx+1)%STELL.length;renderStell();window.scrollTo(0,0)}
+function prevStellungnahme(){stIdx=(stIdx-1+STELL.length)%STELL.length;renderStell();window.scrollTo(0,0)}
+
+function renderBrief(){
+  var t=BRIEF[brIdx];
+  document.getElementById("briefIndex").textContent=brIdx+1;
+  document.getElementById("briefTotal").textContent=BRIEF.length;
+  var saved=(ls().brief||{})[brIdx]||"";
+  var h='<div class="topic-card"><h3>'+escapeHtml(t.t)+'</h3><p>'+escapeHtml(t.s)+'</p></div>';
+  h+='<div class="card"><h4>Schreibe deinen Brief:</h4>';
+  h+='<textarea id="brText" placeholder="Vorname Nachname..." oninput="updateWordCount(this,&quot;brWC&quot;,150)">'+escapeHtml(saved)+'</textarea>';
+  h+='<div class="word-count" id="brWC">0 Woerter (Ziel: 150+)</div>';
+  h+='<button class="btn btn-success btn-block" style="margin-top:8px" onclick="saveBrief()">Speichern</button></div>';
+  h+='<details><summary>Musterloesung anzeigen</summary><div class="quote" style="font-family:monospace;font-size:13px">'+escapeHtml(t.m)+'</div></details>';
+  document.getElementById("briefContent").innerHTML=h;
+  var ta=document.getElementById("brText");
+  if(ta)updateWordCount(ta,"brWC",150);
+}
+function saveBrief(){var s=ls();s.brief=s.brief||{};s.brief[brIdx]=document.getElementById("brText").value;ss(s);alert("Gespeichert!")}
+function nextBrief(){brIdx=(brIdx+1)%BRIEF.length;renderBrief();window.scrollTo(0,0)}
+function prevBrief(){brIdx=(brIdx-1+BRIEF.length)%BRIEF.length;renderBrief();window.scrollTo(0,0)}
+
+function renderInhalts(){
+  var t=INHALTS[inIdx];
+  var saved=(ls().inh||{})[inIdx]||"";
+  var h='<div class="topic-card"><h3>'+escapeHtml(t.t)+'</h3><p style="color:#666;font-size:13px">von '+escapeHtml(t.a)+' ('+escapeHtml(t.j)+')</p><hr><div style="white-space:pre-wrap;line-height:1.7">'+escapeHtml(t.text)+'</div></div>';
+  h+='<div class="card"><h4>Schreibe eine Inhaltsangabe:</h4>';
+  h+='<p style="font-size:13px;color:#666">Tipp: Praesens! Eigene Worte! Keine Meinung!</p>';
+  h+='<textarea id="inText" placeholder="In der Kurzgeschichte..." oninput="updateWordCount(this,&quot;inWC&quot;,150)">'+escapeHtml(saved)+'</textarea>';
+  h+='<div class="word-count" id="inWC">0 Woerter (Ziel: 150+)</div>';
+  h+='<button class="btn btn-success btn-block" style="margin-top:8px" onclick="saveInhalts()">Speichern</button></div>';
+  h+='<details><summary>Musterloesung anzeigen</summary><div class="quote">'+escapeHtml(t.m)+'</div></details>';
+  document.getElementById("inhaltsContent").innerHTML=h;
+  var ta=document.getElementById("inText");
+  if(ta)updateWordCount(ta,"inWC",150);
+}
+function saveInhalts(){var s=ls();s.inh=s.inh||{};s.inh[inIdx]=document.getElementById("inText").value;ss(s);alert("Gespeichert!")}
+function nextInhalts(){inIdx=(inIdx+1)%INHALTS.length;renderInhalts();window.scrollTo(0,0)}
+function prevInhalts(){inIdx=(inIdx-1+INHALTS.length)%INHALTS.length;renderInhalts();window.scrollTo(0,0)}
+
+function renderTeilA(){
+  var t=TEILA[taIdx];
+  document.getElementById("teilAIndex").textContent=taIdx+1;
+  document.getElementById("teilATotal").textContent=TEILA.length;
+  var fragenH=t.q.map(function(f,i){
+    return '<details style="margin-bottom:8px"><summary><b>Frage '+(i+1)+':</b> '+escapeHtml(f.f)+'</summary><div style="margin-top:8px"><textarea placeholder="Schreibe deine Antwort..." style="min-height:80px"></textarea><details style="margin-top:8px;background:#f0f8ff"><summary style="color:#1F3864;font-size:14px">Loesung</summary><div class="quote">'+escapeHtml(f.a)+'</div></details></div></details>';
+  }).join("");
+  var h='<div class="topic-card"><h3>'+escapeHtml(t.t)+'</h3><hr><div style="white-space:pre-wrap;line-height:1.7">'+escapeHtml(t.text)+'</div></div>';
+  h+='<div class="card"><h4>Aufgaben:</h4><div class="alert alert-warning">Tipp: Beginne IMMER mit "Im Text steht, dass..."</div>'+fragenH+'</div>';
+  document.getElementById("teilAContent").innerHTML=h;
+}
+function nextTeilA(){taIdx=(taIdx+1)%TEILA.length;renderTeilA();window.scrollTo(0,0)}
+function prevTeilA(){taIdx=(taIdx-1+TEILA.length)%TEILA.length;renderTeilA();window.scrollTo(0,0)}
+
+function startDrill(type){
+  var data={dasdass:D_DASS,wortarten:D_WORTARTEN,stilmittel:D_STILMITTEL,rechtschreibung:D_RECHT}[type];
+  drillData=data.slice().sort(function(){return Math.random()-0.5});
+  drillIdx=0;drillCorrect=0;drillTotal=0;
+  document.getElementById("drillArea").style.display="block";
+  showDrill();
+}
+function showDrill(){
+  if(drillIdx>=drillData.length){
+    document.getElementById("drillQuestion").textContent="Fertig! "+drillCorrect+"/"+drillTotal+" richtig ("+Math.round(drillCorrect/drillTotal*100)+"%)";
+    document.getElementById("drillOptions").innerHTML='<button class="btn btn-block" onclick="endDrill()">Zurueck</button>';
+    return;
+  }
+  var q=drillData[drillIdx];
+  document.getElementById("drillQuestion").textContent=q[0];
+  document.getElementById("drillFeedback").textContent="";
+  var opts=q[1].map(function(o,i){return '<button class="drill-option" onclick="answerDrill('+i+')">'+escapeHtml(o)+'</button>'}).join("");
+  document.getElementById("drillOptions").innerHTML=opts;
+}
+function answerDrill(idx){
+  var q=drillData[drillIdx];
+  var opts=document.querySelectorAll(".drill-option");
+  opts.forEach(function(o,i){
+    o.disabled=true;
+    if(i===q[2])o.classList.add("correct");
+    if(i===idx&&i!==q[2])o.classList.add("wrong");
+  });
+  drillTotal++;
+  if(idx===q[2]){
+    drillCorrect++;
+    document.getElementById("drillFeedback").innerHTML='<span style="color:#28a745">Richtig!</span>';
+  }else{
+    document.getElementById("drillFeedback").innerHTML='<span style="color:#dc3545">Falsch. Richtig: '+escapeHtml(q[1][q[2]])+'</span>';
+  }
+  document.getElementById("drillCorrect").textContent=drillCorrect;
+  document.getElementById("drillTotal").textContent=drillTotal;
+  document.getElementById("drillPercent").textContent=Math.round(drillCorrect/drillTotal*100)+"%";
+  setTimeout(function(){drillIdx++;showDrill()},1500);
+}
+function endDrill(){document.getElementById("drillArea").style.display="none"}
+
+renderSchedule();
+renderStell();
+renderBrief();
+renderInhalts();
+renderTeilA();
+</script>
+</body>
+</html>
